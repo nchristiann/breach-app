@@ -182,7 +182,7 @@ def show_password_view(event=None):
 
 # Initialize the main application window
 root = tk.Tk()
-root.title("Email and Password Breach Checker")
+root.title("Breach Checker")
 root.geometry("800x600")
 root.resizable(False, False)
 root.configure(bg="#2c3e50")
