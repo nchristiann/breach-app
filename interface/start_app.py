@@ -3,7 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 import requests
 
-EMAILS_FILE = "/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA/emails.txt"
+EMAILS_FILE = "./emails.txt"
 HIBP_API_KEY = "ab62cea28a114653909fa9ef1547d590"
 BASE_URL = "https://haveibeenpwned.com/api/v3"
 
@@ -35,7 +35,7 @@ def check_breach(email):
     else:
         return f"{email}: Error {response.status_code} - {response.text}"
 
-def add_email():
+def add_email(event=None):  # event parameter is added for the keybind
     email = email_entry.get().strip()
     if email and email not in email_listbox.get(0, tk.END):
         email_listbox.insert(tk.END, email)
@@ -65,42 +65,52 @@ def check_all_emails():
 
 root = tk.Tk()
 root.title("Email Breach Checker")
-root.geometry("800x800")
+root.geometry("800x600")
 root.resizable(False, False)
+
+# Set a modern look using colors, fonts, and padding
+root.configure(bg="#2c3e50")
 
 style = ttk.Style()
 style.theme_use('clam')
 
-style.configure('TFrame', background='#f0f0f0')
-style.configure('TLabel', background='#f0f0f0', font=('Arial', 12))
-style.configure('TButton', background='#007acc', foreground='white', font=('Arial', 10, 'bold'))
-style.configure('TEntry', font=('Arial', 12))
+style.configure('TFrame', background='#34495e')
+style.configure('TLabel', background='#34495e', foreground='white', font=('Helvetica', 12))
+style.configure('TButton', background='#3498db', foreground='white', font=('Helvetica', 12, 'bold'), padding=10)
+style.configure('TEntry', font=('Helvetica', 12), padding=10)
+style.configure('TListbox', font=('Helvetica', 12), background='#ecf0f1')
 
-
-
-input_frame = ttk.Frame(root, padding="10 10 10 10")
+input_frame = ttk.Frame(root, padding="20 20 20 20")
 input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-email_label = ttk.Label(input_frame, text="Email:")
-email_label.pack(pady=5)
+# Label for email input
+email_label = ttk.Label(input_frame, text="Enter Email:")
+email_label.pack(pady=10)
 
-email_entry = ttk.Entry(input_frame)
-email_entry.pack(fill=tk.BOTH, expand=True, pady=5)
+# Entry for email input
+email_entry = ttk.Entry(input_frame, width=30)
+email_entry.pack(fill=tk.X, expand=True, pady=5)
 
-add_button = ttk.Button(input_frame, text="Add Email", command=add_email)
-add_button.pack(pady=5)
+# Bind Enter key to the add_email function
+email_entry.bind("<Return>", add_email)
 
+# Delete Email button
 delete_button = ttk.Button(input_frame, text="Delete Email", command=delete_email)
-delete_button.pack(pady=5)
+delete_button.pack(pady=10, fill=tk.X)
 
-email_listbox = tk.Listbox(input_frame, font=('Arial', 12))
-email_listbox.pack(fill=tk.BOTH, expand=True, pady=5)
+# Listbox to show emails
+email_listbox = tk.Listbox(input_frame, font=('Helvetica', 12), height=8)
+email_listbox.pack(fill=tk.BOTH, expand=True, pady=10)
 
+# Button to check breaches
 check_button = ttk.Button(input_frame, text="Check Breaches", command=check_all_emails)
-check_button.pack(pady=5)
+check_button.pack(pady=10, fill=tk.X)
 
-results_text = tk.Text(input_frame, font=('Arial', 12))
-results_text.pack(fill=tk.BOTH, expand=True, pady=5)
+# Results Textbox to display breach results
+results_text = tk.Text(input_frame, font=('Helvetica', 12), height=10, wrap=tk.WORD)
+results_text.pack(fill=tk.BOTH, expand=True, pady=10)
 
+# Load saved emails on startup
 load_emails()
+
 root.mainloop()
