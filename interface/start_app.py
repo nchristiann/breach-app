@@ -26,8 +26,7 @@ results_text = None
 password_entry = None
 password_result_text = None
 check_button = None
-new_button = None
-original_button = None
+sidebar_passwords_button = None
 
 # Function to load emails from the file
 def load_emails():
@@ -111,37 +110,13 @@ def check_all_emails():
     show_loading_animation()
     process_emails()
 
-# Function to switch to the profile view
-def show_profile_view(event=None):
-    # Clear the main frame content
-    for widget in input_frame.winfo_children():
-        widget.destroy()
-
-    # Add profile information widgets
-    profile_label = ttk.Label(input_frame, text="Profile Information", font=('Helvetica', 16, 'bold'))
-    profile_label.pack(pady=10)
-
-    name_label = ttk.Label(input_frame, text="Name: John Doe")
-    name_label.pack(pady=5)
-
-    email_label = ttk.Label(input_frame, text="Email: johndoe@example.com")
-    email_label.pack(pady=5)
-
-    # Button to return to the email management view
-    back_button = ttk.Button(input_frame, text="Back", command=show_email_management_view)
-    back_button.pack(pady=10, fill=tk.X)
-
 # Function to switch back to the email management view
 def show_email_management_view():
-    global email_listbox, email_entry, results_text, check_button, new_button, original_button  # Declare globals for shared access
+    global email_listbox, email_entry, results_text, check_button, sidebar_passwords_button  # Declare globals for shared access
 
     # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
-
-    # Ensure the check button is hidden when switching views
-    if check_button:
-        check_button.pack_forget()
 
     # Re-add email management widgets
     email_label = ttk.Label(input_frame, text="Enter Email:")
@@ -166,6 +141,9 @@ def show_email_management_view():
     # Reload emails into the listbox
     load_emails()
 
+    # Change the sidebar button text to "Passwords" and update the command
+    sidebar_passwords_button.config(text="Passwords", command=show_password_view)
+
 # Function to check password breach
 def check_password():
     password = password_entry.get().strip()
@@ -176,7 +154,6 @@ def check_password():
         password_entry.delete(0, tk.END)  # Clear the password entry box
     else:
         messagebox.showwarning("Invalid Password", "Please enter a valid password.")
-
 
 # Function to switch to the password checking view
 def show_password_view(event=None):
@@ -200,7 +177,7 @@ def show_password_view(event=None):
     password_result_text = tk.Text(input_frame, font=('Helvetica', 12), height=5, wrap=tk.WORD)
     password_result_text.pack(fill=tk.BOTH, expand=True, pady=10)
 
-    # Change the "Passwords" button to "Emails" in the sidebar
+    # Change the sidebar button text to "Emails" and update the command
     sidebar_passwords_button.config(text="Emails", command=show_email_management_view)
 
 # Initialize the main application window
@@ -228,9 +205,6 @@ sidebar.pack(side=tk.LEFT, fill=tk.Y)
 canvas = tk.Canvas(sidebar, width=150, height=150, bg='#34495e', bd=0, highlightthickness=0)
 canvas.pack(pady=(0, 20))
 circle = canvas.create_oval(20, 20, 130, 130, fill="lightblue", outline="white", width=2)
-
-# Bind the circle to show profile view
-canvas.tag_bind(circle, "<Button-1>", show_profile_view)
 
 # Sidebar buttons
 sidebar_settings_button = ttk.Button(sidebar, text="Settings")
