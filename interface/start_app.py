@@ -5,6 +5,8 @@ from pathlib import Path
 import json
 from notif import NotificationSystem
 from hhtp_req import check_breach
+import random
+import string
 
 # Determine the current directory and emails file path
 current_directory = f"{Path.cwd()}"
@@ -19,7 +21,7 @@ else:
 
 notifier = NotificationSystem()
 
-# Global variable to store widgets for dynamic switching
+# Global variables to store widgets for dynamic switching
 email_listbox = None
 email_entry = None
 results_text = None
@@ -27,6 +29,52 @@ password_entry = None
 password_result_text = None
 check_button = None
 sidebar_passwords_button = None
+password_prompt_label = None
+yes_button = None
+no_button = None
+
+def generate_random_password():
+    # Generate a strong random password
+    length = 16
+    characters = string.ascii_letters + string.digits + "!@#$%^&*"
+    password = ''.join(random.choice(characters) for _ in range(length))
+    return password
+
+def show_random_password():
+    # Generate and show the random password
+    random_password = generate_random_password()
+    password_result_text.delete(1.0, tk.END)
+    password_result_text.insert(tk.END, f"Your new random password is:\n{random_password}")
+    remove_password_prompt()
+
+def remove_password_prompt():
+    # Remove the prompt and buttons
+    if password_prompt_label:
+        password_prompt_label.destroy()
+    if yes_button:
+        yes_button.destroy()
+    if no_button:
+        no_button.destroy()
+
+def show_password_prompt():
+    global password_prompt_label, yes_button, no_button
+    
+    # Remove any existing prompt and buttons first
+    remove_password_prompt()
+    
+    # Create new prompt and buttons
+    password_prompt_label = ttk.Label(input_frame, text="Do you want a random new password?", 
+                                    font=('Helvetica', 12))
+    password_prompt_label.pack(pady=10)
+    
+    button_frame = ttk.Frame(input_frame)
+    button_frame.pack(pady=5)
+    
+    yes_button = ttk.Button(button_frame, text="Yes", command=show_random_password)
+    yes_button.pack(side=tk.LEFT, padx=5)
+    
+    no_button = ttk.Button(button_frame, text="No", command=remove_password_prompt)
+    no_button.pack(side=tk.LEFT, padx=5)
 
 # Function to load emails from the file
 def load_emails():
@@ -112,7 +160,7 @@ def check_all_emails():
 
 # Function to switch back to the email management view
 def show_email_management_view():
-    global email_listbox, email_entry, results_text, check_button, sidebar_passwords_button  # Declare globals for shared access
+    global email_listbox, email_entry, results_text, check_button, sidebar_passwords_button
 
     # Clear the main frame content
     for widget in input_frame.winfo_children():
@@ -124,7 +172,7 @@ def show_email_management_view():
 
     email_entry = ttk.Entry(input_frame, width=30)
     email_entry.pack(fill=tk.X, expand=True, pady=5)
-    email_entry.bind("<Return>", add_email)  # Re-bind Enter key to add_email function
+    email_entry.bind("<Return>", add_email)
 
     delete_button = ttk.Button(input_frame, text="Delete Email", command=delete_email)
     delete_button.pack(pady=10, fill=tk.X)
@@ -148,16 +196,18 @@ def show_email_management_view():
 def check_password():
     password = password_entry.get().strip()
     if password:
-        result = check_breach(password)  # Assuming check_breach is the function you want to call
-        password_result_text.delete(1.0, tk.END)  # Clear any previous result
+        result = check_breach(password)
+        password_result_text.delete(1.0, tk.END)
         password_result_text.insert(tk.END, result + "\n")
-        password_entry.delete(0, tk.END)  # Clear the password entry box
+        password_entry.delete(0, tk.END)
+        # Show the random password prompt after checking
+        show_password_prompt()
     else:
         messagebox.showwarning("Invalid Password", "Please enter a valid password.")
 
 # Function to switch to the password checking view
 def show_password_view(event=None):
-    global password_entry, password_result_text, sidebar_passwords_button  # Declare globals for shared access
+    global password_entry, password_result_text, sidebar_passwords_button
 
     # Clear the main frame content
     for widget in input_frame.winfo_children():
@@ -169,7 +219,7 @@ def show_password_view(event=None):
 
     password_entry = ttk.Entry(input_frame, width=30, font=('Helvetica', 12))
     password_entry.pack(fill=tk.X, pady=5)
-    password_entry.bind("<Return>", lambda event: check_password())  # Bind Enter to check_password function
+    password_entry.bind("<Return>", lambda event: check_password())
 
     check_button = ttk.Button(input_frame, text="Check Password", command=check_password)
     check_button.pack(pady=10, fill=tk.X)
