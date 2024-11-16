@@ -23,6 +23,8 @@ notifier = NotificationSystem()
 email_listbox = None
 email_entry = None
 results_text = None
+password_entry = None
+password_result_text = None
 check_button = None
 new_button = None
 original_button = None
@@ -111,7 +113,6 @@ def check_all_emails():
 
 # Function to switch to the profile view
 def show_profile_view(event=None):
-    
     # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
@@ -141,7 +142,6 @@ def show_email_management_view():
     # Ensure the check button is hidden when switching views
     if check_button:
         check_button.pack_forget()
-        
 
     # Re-add email management widgets
     email_label = ttk.Label(input_frame, text="Enter Email:")
@@ -166,9 +166,46 @@ def show_email_management_view():
     # Reload emails into the listbox
     load_emails()
 
+# Function to check password breach
+def check_password():
+    password = password_entry.get().strip()
+    if password:
+        result = check_breach(password)  # Assuming check_breach is the function you want to call
+        password_result_text.delete(1.0, tk.END)  # Clear any previous result
+        password_result_text.insert(tk.END, result + "\n")
+        password_entry.delete(0, tk.END)  # Clear the password entry box
+    else:
+        messagebox.showwarning("Invalid Password", "Please enter a valid password.")
+
+
+# Function to switch to the password checking view
+def show_password_view(event=None):
+    global password_entry, password_result_text, sidebar_passwords_button  # Declare globals for shared access
+
+    # Clear the main frame content
+    for widget in input_frame.winfo_children():
+        widget.destroy()
+
+    # Add password checking widgets
+    password_label = ttk.Label(input_frame, text="Enter Password to Check:", font=('Helvetica', 16, 'bold'))
+    password_label.pack(pady=10)
+
+    password_entry = ttk.Entry(input_frame, width=30, font=('Helvetica', 12))
+    password_entry.pack(fill=tk.X, pady=5)
+    password_entry.bind("<Return>", lambda event: check_password())  # Bind Enter to check_password function
+
+    check_button = ttk.Button(input_frame, text="Check Password", command=check_password)
+    check_button.pack(pady=10, fill=tk.X)
+
+    password_result_text = tk.Text(input_frame, font=('Helvetica', 12), height=5, wrap=tk.WORD)
+    password_result_text.pack(fill=tk.BOTH, expand=True, pady=10)
+
+    # Change the "Passwords" button to "Emails" in the sidebar
+    sidebar_passwords_button.config(text="Emails", command=show_email_management_view)
+
 # Initialize the main application window
 root = tk.Tk()
-root.title("Email Breach Checker")
+root.title("Email and Password Breach Checker")
 root.geometry("800x600")
 root.resizable(False, False)
 root.configure(bg="#2c3e50")
@@ -199,7 +236,7 @@ canvas.tag_bind(circle, "<Button-1>", show_profile_view)
 sidebar_settings_button = ttk.Button(sidebar, text="Settings")
 sidebar_settings_button.pack(fill=tk.X, pady=5)
 
-sidebar_passwords_button = ttk.Button(sidebar, text="Passwords")
+sidebar_passwords_button = ttk.Button(sidebar, text="Passwords", command=show_password_view)
 sidebar_passwords_button.pack(fill=tk.X, pady=5)
 
 sidebar_logout_button = ttk.Button(sidebar, text="Logout")
