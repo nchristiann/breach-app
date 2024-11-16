@@ -139,7 +139,7 @@ def check_all_emails():
                 root.after(6000, process_emails, index + 1)
             else:
                 results_text.insert(tk.END, "All emails checked.\n")
-                check_button.config(text="Check Breaches", command=check_all_emails)
+                check_button.config(text="Check Breaches", command=check_all_emails, state='normal')
                 global processing_done
                 processing_done = True 
         else:
@@ -154,7 +154,7 @@ def check_all_emails():
             root.after(600, animate, i + 1)
         animate()
 
-    check_button.config(text="Checking", command=None)
+    check_button.config(text="Checking", command=None, state='disabled')
     show_loading_animation()
     process_emails()
 
@@ -200,20 +200,16 @@ def check_password():
         password_result_text.delete(1.0, tk.END)
         password_result_text.insert(tk.END, result + "\n")
         password_entry.delete(0, tk.END)
-        # Show the random password prompt after checking
         show_password_prompt()
     else:
         messagebox.showwarning("Invalid Password", "Please enter a valid password.")
 
-# Function to switch to the password checking view
 def show_password_view(event=None):
     global password_entry, password_result_text, sidebar_passwords_button
 
-    # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
 
-    # Add password checking widgets
     password_label = ttk.Label(input_frame, text="Enter Password to Check:", font=('Helvetica', 16, 'bold'))
     password_label.pack(pady=10)
 
