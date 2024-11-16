@@ -2,24 +2,18 @@ import requests
 import argparse
 import sys
 
+# The Have I Been Pawned API Key and URL
 hibp_api_key = "ab62cea28a114653909fa9ef1547d590"
-
 base_url = "https://haveibeenpwned.com/api/v3"
 
-email = "nekulachristy@gmail.com"
-
+# Building the header used to call the API
 headers = {
     "hibp-api-key": hibp_api_key,
     "user-agent": "PythonApp"  # Custom user-agent
 }
 
-# Make the request
-
-counter = len(sys.argv) - 1
-
-
-
-for i in range(counter) :
+# Check the DataBase for each email provided as a command line argument
+for i in range(len(sys.argv) - 1) :
     response = requests.get(f"{base_url}/breachedaccount/{sys.argv[i+1]}", headers=headers)
 
     # Handle the response
