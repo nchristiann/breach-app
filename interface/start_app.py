@@ -66,6 +66,7 @@ style.configure('TButton', background='#007acc', foreground='white', font=('Aria
 style.configure('TEntry', font=('Arial', 12))
 
 
+
 input_frame = ttk.Frame(root, padding="10 10 10 10")
 input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
