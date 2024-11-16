@@ -6,9 +6,15 @@ import json
 from notif import NotificationSystem
 from hhtp_req import check_breach
 
+<<<<<<< HEAD
 # Determine the current directory and emails file path
 current_directory = f"{Path.cwd()}"
 tokens = current_directory.split("/")
+=======
+EMAILS_FILE = "./emails.txt"
+HIBP_API_KEY = "ab62cea28a114653909fa9ef1547d590"
+BASE_URL = "https://haveibeenpwned.com/api/v3"
+>>>>>>> b799a3d773bc5d6c4bf5e8b5dd45f0558309aad9
 
 if tokens[-1] == "input":
     EMAILS_FILE = f"{Path.cwd()}/emails.json"
@@ -41,8 +47,25 @@ def save_emails():
     with open(EMAILS_FILE, "w") as file:
         json.dump({"emails": list(emails)}, file)
 
+<<<<<<< HEAD
 # Function to add an email
 def add_email(event=None):
+=======
+def check_breach(email):
+    headers = {
+        "hibp-api-key": HIBP_API_KEY,
+        "user-agent": "PythonApp"
+    }
+    response = requests.get(f"{BASE_URL}/breachedaccount/{email}", headers=headers)
+    if response.status_code == 200:
+        return f"{email}: Breached! Details: {response.json()}"
+    elif response.status_code == 404:
+        return f"{email}: No breach found."
+    else:
+        return f"{email}: Error {response.status_code} - {response.text}"
+
+def add_email(event=None):  # event parameter is added for the keybind
+>>>>>>> b799a3d773bc5d6c4bf5e8b5dd45f0558309aad9
     email = email_entry.get().strip()
     if email and email not in email_listbox.get(0, tk.END):
         email_listbox.insert(tk.END, email)
@@ -130,7 +153,13 @@ root.geometry("800x600")
 root.resizable(False, False)
 root.configure(bg="#2c3e50")
 
+<<<<<<< HEAD
 # Configure styles for the application
+=======
+# Set a modern look using colors, fonts, and padding
+root.configure(bg="#2c3e50")
+
+>>>>>>> b799a3d773bc5d6c4bf5e8b5dd45f0558309aad9
 style = ttk.Style()
 style.theme_use('alt')
 
@@ -140,6 +169,7 @@ style.configure('TButton', background='#3498db', foreground='white', font=('Helv
 style.configure('TEntry', font=('Helvetica', 12), padding=10)
 style.configure('TListbox', font=('Helvetica', 12), background='#ecf0f1')
 
+<<<<<<< HEAD
 # Create a frame for the sidebar
 sidebar = ttk.Frame(root, width=200, relief='sunken', padding=(20, 20))
 sidebar.pack(side=tk.LEFT, fill=tk.Y)
@@ -170,4 +200,39 @@ input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, side=tk.RIGHT)
 show_email_management_view()
 
 # Run the application
+=======
+input_frame = ttk.Frame(root, padding="20 20 20 20")
+input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+# Label for email input
+email_label = ttk.Label(input_frame, text="Enter Email:")
+email_label.pack(pady=10)
+
+# Entry for email input
+email_entry = ttk.Entry(input_frame, width=30)
+email_entry.pack(fill=tk.X, expand=True, pady=5)
+
+# Bind Enter key to the add_email function
+email_entry.bind("<Return>", add_email)
+
+# Delete Email button
+delete_button = ttk.Button(input_frame, text="Delete Email", command=delete_email)
+delete_button.pack(pady=10, fill=tk.X)
+
+# Listbox to show emails
+email_listbox = tk.Listbox(input_frame, font=('Helvetica', 12), height=8)
+email_listbox.pack(fill=tk.BOTH, expand=True, pady=10)
+
+# Button to check breaches
+check_button = ttk.Button(input_frame, text="Check Breaches", command=check_all_emails)
+check_button.pack(pady=10, fill=tk.X)
+
+# Results Textbox to display breach results
+results_text = tk.Text(input_frame, font=('Helvetica', 12), height=10, wrap=tk.WORD)
+results_text.pack(fill=tk.BOTH, expand=True, pady=10)
+
+# Load saved emails on startup
+load_emails()
+
+>>>>>>> b799a3d773bc5d6c4bf5e8b5dd45f0558309aad9
 root.mainloop()
