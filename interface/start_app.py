@@ -1,7 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+import requests
+
 EMAILS_FILE = "/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA/emails.txt"
+HIBP_API_KEY = "ab62cea28a114653909fa9ef1547d590"
+BASE_URL = "https://haveibeenpwned.com/api/v3"
 
 def load_emails():
     try:
@@ -19,10 +23,17 @@ def save_emails():
             file.write(email + "\n")
 
 def check_breach(email):
-    breached_emails = ["test@example.com", "user@breach.com"]
-    if email in breached_emails:
-        return f"{email}: Breached!"
-    return f"{email}: No breach found."
+    headers = {
+        "hibp-api-key": HIBP_API_KEY,
+        "user-agent": "PythonApp"
+    }
+    response = requests.get(f"{BASE_URL}/breachedaccount/{email}", headers=headers)
+    if response.status_code == 200:
+        return f"{email}: Breached! Details: {response.json()}"
+    elif response.status_code == 404:
+        return f"{email}: No breach found."
+    else:
+        return f"{email}: Error {response.status_code} - {response.text}"
 
 def add_email():
     email = email_entry.get().strip()
