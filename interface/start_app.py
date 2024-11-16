@@ -1,65 +1,94 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+EMAILS_FILE = "/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA/emails.txt"
 
+def load_emails():
+    try:
+        with open(EMAILS_FILE, "r") as file:
+            emails = file.readlines()
+            for email in emails:
+                email_listbox.insert(tk.END, email.strip())
+    except FileNotFoundError:
+        pass
 
-# Dummy function to simulate breach checking
+def save_emails():
+    emails = email_listbox.get(0, tk.END)
+    with open(EMAILS_FILE, "w") as file:
+        for email in emails:
+            file.write(email + "\n")
+
 def check_breach(email):
-    # Simulate breach checking logic (replace with actual API calls later)
     breached_emails = ["test@example.com", "user@breach.com"]
     if email in breached_emails:
         return f"{email}: Breached!"
     return f"{email}: No breach found."
 
-
-# Add email to the list
 def add_email():
     email = email_entry.get().strip()
     if email and email not in email_listbox.get(0, tk.END):
         email_listbox.insert(tk.END, email)
         email_entry.delete(0, tk.END)
+        save_emails()
     else:
         messagebox.showwarning("Invalid Email", "Enter a valid email or avoid duplicates.")
 
+def delete_email():
+    selected_email = email_listbox.curselection()
+    if selected_email:
+        email_listbox.delete(selected_email)
+        save_emails()
+    else:
+        messagebox.showwarning("No Selection", "Select an email to delete.")
 
-# Check breaches for all emails
 def check_all_emails():
     emails = email_listbox.get(0, tk.END)
     if not emails:
         messagebox.showinfo("No Emails", "Add some emails first.")
         return
 
-    results_text.delete(1.0, tk.END)  # Clear previous results
+    results_text.delete(1.0, tk.END)
     for email in emails:
         result = check_breach(email)
         results_text.insert(tk.END, result + "\n")
 
-
-# GUI Setup
 root = tk.Tk()
 root.title("Email Breach Checker")
-root.geometry("500x400")
+root.geometry("800x800")
+root.resizable(False, False)
 
-# Input Area
-email_label = tk.Label(root, text="Email:")
+style = ttk.Style()
+style.theme_use('clam')
+
+style.configure('TFrame', background='#f0f0f0')
+style.configure('TLabel', background='#f0f0f0', font=('Arial', 12))
+style.configure('TButton', background='#007acc', foreground='white', font=('Arial', 10, 'bold'))
+style.configure('TEntry', font=('Arial', 12))
+
+
+input_frame = ttk.Frame(root, padding="10 10 10 10")
+input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+email_label = ttk.Label(input_frame, text="Email:")
 email_label.pack(pady=5)
 
-email_entry = tk.Entry(root, width=40)
-email_entry.pack(pady=5)
+email_entry = ttk.Entry(input_frame)
+email_entry.pack(fill=tk.BOTH, expand=True, pady=5)
 
-add_button = tk.Button(root, text="Add Email", command=add_email)
+add_button = ttk.Button(input_frame, text="Add Email", command=add_email)
 add_button.pack(pady=5)
 
-# Email List
-email_listbox = tk.Listbox(root, height=10, width=40)
-email_listbox.pack(pady=10)
+delete_button = ttk.Button(input_frame, text="Delete Email", command=delete_email)
+delete_button.pack(pady=5)
 
-# Check Breaches Button
-check_button = tk.Button(root, text="Check Breaches", command=check_all_emails)
-check_button.pack(pady=10)
+email_listbox = tk.Listbox(input_frame, font=('Arial', 12))
+email_listbox.pack(fill=tk.BOTH, expand=True, pady=5)
 
-# Results Display
-results_text = tk.Text(root, height=10, width=60)
-results_text.pack(pady=10)
+check_button = ttk.Button(input_frame, text="Check Breaches", command=check_all_emails)
+check_button.pack(pady=5)
 
-# Run the Application
+results_text = tk.Text(input_frame, font=('Arial', 12))
+results_text.pack(fill=tk.BOTH, expand=True, pady=5)
+
+load_emails()
 root.mainloop()
