@@ -1,47 +1,37 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-import requests
-import json
 import sys
+from pathlib import Path
+import json
 from notif import NotificationSystem
+from hhtp_req import check_breach
 
-sys.path.append('/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA')
+current_directory = f"{Path.cwd()}"
+tokens = current_directory.split("/")
 
-EMAILS_FILE = "/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA/emails.txt"
-HIBP_API_KEY = "ab62cea28a114653909fa9ef1547d590"
-BASE_URL = "https://haveibeenpwned.com/api/v3"
+if tokens[-1] == "input":
+    EMAILS_FILE = f"{Path.cwd()}/emails.json"
+elif tokens[-1] == "HHAHHAHAHAHAHHAHA":
+    EMAILS_FILE = f"{Path.cwd()}/input/emails.json"
+else:
+    EMAILS_FILE = f"{Path.cwd()}/emails.json"  # Default path
 
 notifier = NotificationSystem()
 
 def load_emails():
     try:
         with open(EMAILS_FILE, "r") as file:
-            emails = file.readlines()
+            emails = json.load(file)["emails"]
             for email in emails:
-                email_listbox.insert(tk.END, email.strip())
+                email_listbox.insert(tk.END, email)
     except FileNotFoundError:
         pass
 
 def save_emails():
     emails = email_listbox.get(0, tk.END)
     with open(EMAILS_FILE, "w") as file:
-        for email in emails:
-            file.write(email + "\n")
-
-def check_breach(email):
-    headers = {
-        "hibp-api-key": HIBP_API_KEY,
-        "user-agent": "PythonApp"
-    }
-    response = requests.get(f"{BASE_URL}/breachedaccount/{email}", headers=headers)
-    if response.status_code == 200:
-        notifier.send_notification("Breach Alert", f"{email} has been breached!")
-        return f"{email}: Breached! Details: {response.json()}"
-    elif response.status_code == 404:
-        return f"{email}: No breach found."
-    else:
-        return f"{email}: Error {response.status_code} - {response.text}"
+        json.dump({"emails": list(emails)}, file)
 
 def add_email():
     email = email_entry.get().strip()
@@ -64,6 +54,8 @@ def check_all_emails():
     results_text.delete(1.0, tk.END)
     for email in emails:
         result = check_breach(email)
+        if "Breached!" in result:
+            notifier.send_notification("Breach Alert", f"{email} has been breached!")
         results_text.insert(tk.END, result + "\n")
 
 root = tk.Tk()
