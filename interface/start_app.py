@@ -2,10 +2,17 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import requests
+import json
+import sys
+from notif import NotificationSystem
+
+sys.path.append('/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA')
 
 EMAILS_FILE = "/mnt/d/ubuntu/Cyber/HHAHHAHAHAHAHHAHA/emails.txt"
 HIBP_API_KEY = "ab62cea28a114653909fa9ef1547d590"
 BASE_URL = "https://haveibeenpwned.com/api/v3"
+
+notifier = NotificationSystem()
 
 def load_emails():
     try:
@@ -29,6 +36,7 @@ def check_breach(email):
     }
     response = requests.get(f"{BASE_URL}/breachedaccount/{email}", headers=headers)
     if response.status_code == 200:
+        notifier.send_notification("Breach Alert", f"{email} has been breached!")
         return f"{email}: Breached! Details: {response.json()}"
     elif response.status_code == 404:
         return f"{email}: No breach found."
@@ -41,21 +49,16 @@ def add_email():
         email_listbox.insert(tk.END, email)
         email_entry.delete(0, tk.END)
         save_emails()
-    else:
-        messagebox.showwarning("Invalid Email", "Enter a valid email or avoid duplicates.")
 
 def delete_email():
     selected_email = email_listbox.curselection()
     if selected_email:
         email_listbox.delete(selected_email)
         save_emails()
-    else:
-        messagebox.showwarning("No Selection", "Select an email to delete.")
 
 def check_all_emails():
     emails = email_listbox.get(0, tk.END)
     if not emails:
-        messagebox.showinfo("No Emails", "Add some emails first.")
         return
 
     results_text.delete(1.0, tk.END)
@@ -75,8 +78,6 @@ style.configure('TFrame', background='#f0f0f0')
 style.configure('TLabel', background='#f0f0f0', font=('Arial', 12))
 style.configure('TButton', background='#007acc', foreground='white', font=('Arial', 10, 'bold'))
 style.configure('TEntry', font=('Arial', 12))
-
-
 
 input_frame = ttk.Frame(root, padding="10 10 10 10")
 input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
