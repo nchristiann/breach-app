@@ -32,6 +32,90 @@ sidebar_passwords_button = None
 password_prompt_label = None
 yes_button = None
 no_button = None
+isLoggedIn = False
+
+def show_login_screen():
+    # Clear the main frame content
+    for widget in input_frame.winfo_children():
+        widget.destroy()
+
+    # Display login form components
+    login_label = ttk.Label(input_frame, text="Log In to Your Account", font=('Helvetica', 16, 'bold'))
+    login_label.pack(pady=20)
+
+    username_label = ttk.Label(input_frame, text="Username:")
+    username_label.pack(pady=5)
+    username_entry = ttk.Entry(input_frame, width=30)
+    username_entry.pack(pady=5)
+
+    password_label = ttk.Label(input_frame, text="Password:")
+    password_label.pack(pady=5)
+    password_entry = ttk.Entry(input_frame, width=30, show="*")
+    password_entry.pack(pady=5)
+
+    toggle_var = tk.BooleanVar(value=True)  
+
+    def handle_toggle():
+        state = "Private" if toggle_var.get() else "Public"
+        # print(f"Toggle state changed to {state}")  
+        # messagebox.showinfo("Toggle State", f"Account is now {state}")
+
+    # Create the toggle button
+    toggle_button = ttk.Checkbutton(
+        input_frame,
+        text="Remember Me",  
+        variable=toggle_var,  
+        command=handle_toggle  
+    )
+    toggle_button.pack(pady=10)
+
+    def handle_login():
+        username = username_entry.get().strip()
+        password = password_entry.get().strip()
+        if username == "test" and password == "test":  
+            messagebox.showinfo("Login Successful", "Welcome back!")
+            isLoggedIn = True
+            show_email_management_view()
+        else:
+            messagebox.showerror("Login Failed", "Invalid username or password. Please try again.")
+
+    login_button = ttk.Button(input_frame, text="Log In", command=handle_login)
+    login_button.pack(pady=10, fill=tk.X)
+
+    # Option to exit
+    exit_button = ttk.Button(input_frame, text="Exit", command=root.destroy)
+    exit_button.pack(pady=10, fill=tk.X)
+
+def show_settings_template():
+    # Clear the main frame content
+    for widget in input_frame.winfo_children():
+        widget.destroy()
+    
+    # Add a label for the settings page
+    settings_label = ttk.Label(input_frame, text="Settings", font=('Helvetica', 16, 'bold'))
+    settings_label.pack(pady=10)
+
+    toggle_var = tk.BooleanVar(value=False)  
+
+    def handle_toggle():
+        state = "Private" if toggle_var.get() else "Public"
+        print(f"Toggle state changed to {state}")  
+        messagebox.showinfo("Toggle State", f"Account is now {state}")
+
+    # Create the toggle button
+    toggle_button = ttk.Checkbutton(
+        input_frame,
+        text="Enable Feature",  
+        variable=toggle_var,  
+        command=handle_toggle  
+    )
+    toggle_button.pack(pady=10)
+
+    # Add other settings options here if needed
+    additional_label = ttk.Label(input_frame, text="More settings coming soon...", font=('Helvetica', 12))
+    additional_label.pack(pady=10)
+      
+
 
 def generate_random_password():
     # Generate a strong random password
@@ -192,7 +276,7 @@ def show_email_management_view():
     # Change the sidebar button text to "Passwords" and update the command
     sidebar_passwords_button.config(text="Passwords", command=show_password_view)
 
-# Function to check password breach
+# Function to check password breachs
 def check_password():
     password = password_entry.get().strip()
     if password:
@@ -203,6 +287,24 @@ def check_password():
         show_password_prompt()
     else:
         messagebox.showwarning("Invalid Password", "Please enter a valid password.")
+
+def show_logout_screen():
+    # Clear the main frame content
+    for widget in input_frame.winfo_children():
+        widget.destroy()
+
+    # Display a message prompting the user to log in
+    logout_label = ttk.Label(input_frame, text="You must log in to use the app.", font=('Helvetica', 16, 'bold'))
+    logout_label.pack(pady=20)
+
+    # Add a "Log In" button to show the login screen
+    login_button = ttk.Button(input_frame, text="Log In", command=show_login_screen)
+    login_button.pack(pady=10, fill=tk.X)
+
+    # Add an Exit button to close the app
+    exit_button = ttk.Button(input_frame, text="Exit", command=root.destroy)
+    exit_button.pack(pady=10, fill=tk.X)
+
 
 def show_password_view(event=None):
     global password_entry, password_result_text, sidebar_passwords_button
@@ -253,15 +355,23 @@ canvas.pack(pady=(0, 20))
 circle = canvas.create_oval(20, 20, 130, 130, fill="lightblue", outline="white", width=2)
 
 # Sidebar buttons
-sidebar_settings_button = ttk.Button(sidebar, text="Settings")
+sidebar_settings_button = ttk.Button(sidebar, text="Settings",command=show_settings_template)
 sidebar_settings_button.pack(fill=tk.X, pady=5)
 
 sidebar_passwords_button = ttk.Button(sidebar, text="Passwords", command=show_password_view)
 sidebar_passwords_button.pack(fill=tk.X, pady=5)
 
-sidebar_logout_button = ttk.Button(sidebar, text="Logout")
-sidebar_logout_button.pack(fill=tk.X, pady=5)
+if isLoggedIn == True :
+    sidebar_logout_button = ttk.Button(sidebar, text="Logout", command=show_logout_screen)
+    isLoggedIn == False
+    sidebar_logout_button.pack(fill=tk.X, pady=5)
+elif isLoggedIn == False :
+    sidebar_logout_button = ttk.Button(sidebar, text="Log In", command=show_login_screen)
+    isLoggedIn == True
+    sidebar_logout_button.pack(fill=tk.X, pady=5)
 
+sidebar_exit_button = ttk.Button(sidebar, text="EXIT",command=root.destroy)
+sidebar_exit_button.pack(fill=tk.X,pady=5)
 # Main frame for email management
 input_frame = ttk.Frame(root, padding="20 20 20 20")
 input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, side=tk.RIGHT)
