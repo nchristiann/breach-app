@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 from notif import NotificationSystem
 from hhtp_req import check_breach
+from main import check_pass
 import random
 import string
 
@@ -280,7 +281,7 @@ def show_email_management_view():
 def check_password():
     password = password_entry.get().strip()
     if password:
-        result = check_breach(password)
+        result = check_pass(password)
         password_result_text.delete(1.0, tk.END)
         password_result_text.insert(tk.END, result + "\n")
         password_entry.delete(0, tk.END)
@@ -317,7 +318,7 @@ def show_password_view(event=None):
 
     password_entry = ttk.Entry(input_frame, width=30, font=('Helvetica', 12))
     password_entry.pack(fill=tk.X, pady=5)
-    password_entry.bind("<Return>", lambda event: check_password())
+    password_entry.bind("<Return>", lambda event: show_password_in_textbox())
 
     check_button = ttk.Button(input_frame, text="Check Password", command=check_password)
     check_button.pack(pady=10, fill=tk.X)
@@ -327,6 +328,28 @@ def show_password_view(event=None):
 
     # Change the sidebar button text to "Emails" and update the command
     sidebar_passwords_button.config(text="Emails", command=show_email_management_view)
+
+def show_password_in_textbox():
+    password = password_entry.get().strip()
+    if password:
+        password_result_text.delete(1.0, tk.END)
+        password_result_text.insert(tk.END, f"Password entered: {password}\n")
+        store_password(password)
+    else:
+        messagebox.showwarning("Invalid Password", "Please enter a valid password.")    
+
+def store_password(password):
+    passwd_file = 'passwd.json'
+    try:
+        with open(passwd_file, 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = []
+
+    data.append(password)
+
+    with open(passwd_file, 'w') as file:
+        json.dump(data, file)
 
 # Initialize the main application window
 root = tk.Tk()
