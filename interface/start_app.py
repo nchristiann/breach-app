@@ -9,7 +9,7 @@ from main import check_pass
 import random
 import string
 
-# Determine the current directory and emails file path
+
 current_directory = f"{Path.cwd()}"
 tokens = current_directory.split("/")
 
@@ -22,7 +22,7 @@ else:
 
 notifier = NotificationSystem()
 
-# Global variables to store widgets for dynamic switching
+
 email_listbox = None
 email_entry = None
 results_text = None
@@ -36,11 +36,9 @@ no_button = None
 isLoggedIn = False
 
 def show_login_screen():
-    # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
 
-    # Display login form components
     login_label = ttk.Label(input_frame, text="Log In to Your Account", font=('Helvetica', 16, 'bold'))
     login_label.pack(pady=20)
 
@@ -58,10 +56,7 @@ def show_login_screen():
 
     def handle_toggle():
         state = "Private" if toggle_var.get() else "Public"
-        # print(f"Toggle state changed to {state}")  
-        # messagebox.showinfo("Toggle State", f"Account is now {state}")
 
-    # Create the toggle button
     toggle_button = ttk.Checkbutton(
         input_frame,
         text="Remember Me",  
@@ -83,16 +78,13 @@ def show_login_screen():
     login_button = ttk.Button(input_frame, text="Log In", command=handle_login)
     login_button.pack(pady=10, fill=tk.X)
 
-    # Option to exit
     exit_button = ttk.Button(input_frame, text="Exit", command=root.destroy)
     exit_button.pack(pady=10, fill=tk.X)
 
 def show_settings_template():
-    # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
     
-    # Add a label for the settings page
     settings_label = ttk.Label(input_frame, text="Settings", font=('Helvetica', 16, 'bold'))
     settings_label.pack(pady=10)
 
@@ -103,7 +95,6 @@ def show_settings_template():
         print(f"Toggle state changed to {state}")  
         messagebox.showinfo("Toggle State", f"Account is now {state}")
 
-    # Create the toggle button
     toggle_button = ttk.Checkbutton(
         input_frame,
         text="Enable Feature",  
@@ -112,28 +103,24 @@ def show_settings_template():
     )
     toggle_button.pack(pady=10)
 
-    # Add other settings options here if needed
     additional_label = ttk.Label(input_frame, text="More settings coming soon...", font=('Helvetica', 12))
     additional_label.pack(pady=10)
       
 
 
 def generate_random_password():
-    # Generate a strong random password
     length = 16
     characters = string.ascii_letters + string.digits + "!@#$%^&*"
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
 def show_random_password():
-    # Generate and show the random password
     random_password = generate_random_password()
     password_result_text.delete(1.0, tk.END)
     password_result_text.insert(tk.END, f"Your new random password is:\n{random_password}")
     remove_password_prompt()
 
 def remove_password_prompt():
-    # Remove the prompt and buttons
     if password_prompt_label:
         password_prompt_label.destroy()
     if yes_button:
@@ -144,10 +131,8 @@ def remove_password_prompt():
 def show_password_prompt():
     global password_prompt_label, yes_button, no_button
     
-    # Remove any existing prompt and buttons first
     remove_password_prompt()
     
-    # Create new prompt and buttons
     password_prompt_label = ttk.Label(input_frame, text="Do you want a random new password?", 
                                     font=('Helvetica', 12))
     password_prompt_label.pack(pady=10)
@@ -161,7 +146,6 @@ def show_password_prompt():
     no_button = ttk.Button(button_frame, text="No", command=remove_password_prompt)
     no_button.pack(side=tk.LEFT, padx=5)
 
-# Function to load emails from the file
 def load_emails():
     try:
         with open(EMAILS_FILE, "r") as file:
@@ -171,14 +155,12 @@ def load_emails():
     except FileNotFoundError:
         pass
 
-# Function to save emails to the file
 def save_emails():
     emails = email_listbox.get(0, tk.END)
     Path(EMAILS_FILE).parent.mkdir(parents=True, exist_ok=True)
     with open(EMAILS_FILE, "w") as file:
         json.dump({"emails": list(emails)}, file)
 
-# Function to add an email
 def add_email(event=None):
     email = email_entry.get().strip()
     if email and email not in email_listbox.get(0, tk.END):
@@ -188,14 +170,12 @@ def add_email(event=None):
     else:
         messagebox.showwarning("Invalid Email", "Please enter a valid and unique email.")
 
-# Function to delete a selected email
 def delete_email():
     selected_email = email_listbox.curselection()
     if selected_email:
         email_listbox.delete(selected_email)
         save_emails()
 
-# Function to check breaches for all emails
 def check_all_emails():
     emails = email_listbox.get(0, tk.END)
     if not emails:
@@ -203,8 +183,7 @@ def check_all_emails():
 
     results_text.delete(1.0, tk.END)
     global processing_done
-    processing_done = False  # Flag to control the animation
-
+    processing_done = False  
     def check_email(email):
         try:
             result = check_breach(email)
@@ -243,15 +222,12 @@ def check_all_emails():
     show_loading_animation()
     process_emails()
 
-# Function to switch back to the email management view
 def show_email_management_view():
     global email_listbox, email_entry, results_text, check_button, sidebar_passwords_button
 
-    # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
 
-    # Re-add email management widgets
     email_label = ttk.Label(input_frame, text="Enter Email:")
     email_label.pack(pady=10)
 
@@ -271,13 +247,10 @@ def show_email_management_view():
     results_text = tk.Text(input_frame, font=('Helvetica', 12), height=10, wrap=tk.WORD)
     results_text.pack(fill=tk.BOTH, expand=True, pady=10)
 
-    # Reload emails into the listbox
     load_emails()
 
-    # Change the sidebar button text to "Passwords" and update the command
     sidebar_passwords_button.config(text="Passwords", command=show_password_view)
 
-# Function to check password breachs
 def check_password():
     password = password_entry.get().strip()
     if password:
@@ -290,19 +263,15 @@ def check_password():
         messagebox.showwarning("Invalid Password", "Please enter a valid password.")
 
 def show_logout_screen():
-    # Clear the main frame content
     for widget in input_frame.winfo_children():
         widget.destroy()
 
-    # Display a message prompting the user to log in
     logout_label = ttk.Label(input_frame, text="You must log in to use the app.", font=('Helvetica', 16, 'bold'))
     logout_label.pack(pady=20)
 
-    # Add a "Log In" button to show the login screen
     login_button = ttk.Button(input_frame, text="Log In", command=show_login_screen)
     login_button.pack(pady=10, fill=tk.X)
 
-    # Add an Exit button to close the app
     exit_button = ttk.Button(input_frame, text="Exit", command=root.destroy)
     exit_button.pack(pady=10, fill=tk.X)
 
@@ -326,7 +295,6 @@ def show_password_view(event=None):
     password_result_text = tk.Text(input_frame, font=('Helvetica', 12), height=5, wrap=tk.WORD)
     password_result_text.pack(fill=tk.BOTH, expand=True, pady=10)
 
-    # Change the sidebar button text to "Emails" and update the command
     sidebar_passwords_button.config(text="Emails", command=show_email_management_view)
 
 def show_password_in_textbox():
@@ -351,14 +319,12 @@ def store_password(password):
     with open(passwd_file, 'w') as file:
         json.dump(data, file)
 
-# Initialize the main application window
 root = tk.Tk()
 root.title("Breach Checker")
 root.geometry("800x600")
 root.resizable(False, False)
 root.configure(bg="#2c3e50")
 
-# Configure styles for the application
 style = ttk.Style()
 style.theme_use('alt')
 
@@ -368,16 +334,13 @@ style.configure('TButton', background='#3498db', foreground='white', font=('Helv
 style.configure('TEntry', font=('Helvetica', 12), padding=10)
 style.configure('TListbox', font=('Helvetica', 12), background='#ecf0f1')
 
-# Create a frame for the sidebar
 sidebar = ttk.Frame(root, width=200, relief='sunken', padding=(20, 20))
 sidebar.pack(side=tk.LEFT, fill=tk.Y)
 
-# Add a canvas for the profile picture circle at the top of the sidebar
 canvas = tk.Canvas(sidebar, width=150, height=150, bg='#34495e', bd=0, highlightthickness=0)
 canvas.pack(pady=(0, 20))
 circle = canvas.create_oval(20, 20, 130, 130, fill="lightblue", outline="white", width=2)
 
-# Sidebar buttons
 sidebar_settings_button = ttk.Button(sidebar, text="Settings",command=show_settings_template)
 sidebar_settings_button.pack(fill=tk.X, pady=5)
 
@@ -395,12 +358,9 @@ elif isLoggedIn == False :
 
 sidebar_exit_button = ttk.Button(sidebar, text="EXIT",command=root.destroy)
 sidebar_exit_button.pack(fill=tk.X,pady=5)
-# Main frame for email management
 input_frame = ttk.Frame(root, padding="20 20 20 20")
 input_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, side=tk.RIGHT)
 
-# Show the email management view by default
 show_email_management_view()
 
-# Run the application
 root.mainloop()
